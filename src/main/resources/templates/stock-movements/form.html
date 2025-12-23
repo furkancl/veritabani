@@ -1,0 +1,67 @@
+<!DOCTYPE html>
+<html xmlns:th="http://www.thymeleaf.org" 
+      xmlns:sec="http://www.thymeleaf.org/extras/spring-security">
+<head th:replace="~{fragments/layout :: head('Stok Hareketi Ekle')}"></head>
+<body>
+    <nav th:replace="~{fragments/layout :: sidebar}"></nav>
+    
+    <div class="main-content">
+        <div th:replace="~{fragments/layout :: topbar}" th:with="pageTitle='Yeni Stok Hareketi'"></div>
+        <div th:replace="~{fragments/layout :: alerts}"></div>
+        
+        <div class="card">
+            <div class="card-header">
+                <i class="bi bi-arrow-left-right me-2"></i>Yeni Stok Hareketi Oluştur
+            </div>
+            <div class="card-body">
+                <form th:action="@{/stock-movements/save}" method="post">
+                    <div class="row">
+                        <div class="col-md-6 mb-3">
+                            <label class="form-label">Ürün *</label>
+                            <select name="productId" class="form-select" required>
+                                <option value="">Ürün Seçin</option>
+                                <option th:each="product : ${products}" th:value="${product.id}" 
+                                        th:text="${product.code + ' - ' + product.name + ' (Stok: ' + product.stockQuantity + ')'}">
+                                    Ürün
+                                </option>
+                            </select>
+                        </div>
+                        <div class="col-md-6 mb-3">
+                            <label class="form-label">Hareket Tipi *</label>
+                            <select name="movementType" class="form-select" required>
+                                <option value="">Hareket Tipi Seçin</option>
+                                <option value="IN">Stok Girişi</option>
+                                <option value="OUT">Stok Çıkışı</option>
+                            </select>
+                        </div>
+                    </div>
+                    
+                    <div class="row">
+                        <div class="col-md-6 mb-3">
+                            <label class="form-label">Miktar *</label>
+                            <input type="number" name="quantity" class="form-control" min="1" required>
+                        </div>
+                    </div>
+                    
+                    <div class="mb-3">
+                        <label class="form-label">Açıklama</label>
+                        <textarea name="description" class="form-control" rows="3" 
+                                  placeholder="Stok hareketi ile ilgili notlar..."></textarea>
+                    </div>
+                    
+                    <div class="d-flex justify-content-end gap-2">
+                        <a th:href="@{/stock-movements}" class="btn btn-secondary">
+                            <i class="bi bi-x-circle me-2"></i>İptal
+                        </a>
+                        <button type="submit" class="btn btn-primary">
+                            <i class="bi bi-check-circle me-2"></i>Kaydet
+                        </button>
+                    </div>
+                </form>
+            </div>
+        </div>
+    </div>
+    
+    <div th:replace="~{fragments/layout :: scripts}"></div>
+</body>
+</html>

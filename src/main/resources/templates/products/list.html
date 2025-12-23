@@ -1,0 +1,99 @@
+<!DOCTYPE html>
+<html xmlns:th="http://www.thymeleaf.org" 
+      xmlns:sec="http://www.thymeleaf.org/extras/spring-security">
+<head th:replace="~{fragments/layout :: head('Ürünler')}"></head>
+<body>
+    <nav th:replace="~{fragments/layout :: sidebar}"></nav>
+    
+    <div class="main-content">
+        <div th:replace="~{fragments/layout :: topbar}" th:with="pageTitle='Ürün Yönetimi'"></div>
+        <div th:replace="~{fragments/layout :: alerts}"></div>
+        
+        <div class="table-container">
+            <div class="d-flex justify-content-between align-items-center mb-4">
+                <div>
+                    <h5 class="mb-0 d-inline-block"><i class="bi bi-box me-2"></i>Ürün Listesi</h5>
+                    <span th:if="${isLowStockView}" class="badge bg-danger ms-2">Düşük Stoklu Ürünler</span>
+                    <span th:if="${searchQuery}" class="badge bg-info ms-2" th:text="'Arama: ' + ${searchQuery}">Arama</span>
+                </div>
+                <div class="d-flex gap-2">
+                    <form th:action="@{/products/search}" method="get" class="d-flex">
+                        <input type="text" name="query" class="form-control form-control-sm" placeholder="Ürün ara...">
+                        <button type="submit" class="btn btn-outline-secondary btn-sm ms-1">
+                            <i class="bi bi-search"></i>
+                        </button>
+                    </form>
+                    <a th:href="@{/products/low-stock}" class="btn btn-outline-danger btn-sm">
+                        <i class="bi bi-exclamation-triangle me-1"></i>Düşük Stok
+                    </a>
+                    <a th:href="@{/products/new}" class="btn btn-primary btn-sm">
+                        <i class="bi bi-plus-circle me-1"></i>Yeni Ürün
+                    </a>
+                </div>
+            </div>
+            
+            <div class="table-responsive">
+                <table class="table table-hover">
+                    <thead class="table-dark">
+                        <tr>
+                            <th>Kod</th>
+                            <th>Ürün Adı</th>
+                            <th>Kategori</th>
+                            <th>Tedarikçi</th>
+                            <th>Fiyat</th>
+                            <th>Stok</th>
+                            <th>Birim</th>
+                            <th>Durum</th>
+                            <th>İşlemler</th>
+                        </tr>
+                    </thead>
+                    <tbody>
+                        <tr th:each="product : ${products}">
+                            <td th:text="${product.code}">PRD001</td>
+                            <td th:text="${product.name}">Ürün Adı</td>
+                            <td th:text="${product.category?.name}">Kategori</td>
+                            <td th:text="${product.supplier?.name}">Tedarikçi</td>
+                            <td th:text="${#numbers.formatDecimal(product.price, 0, 'COMMA', 2, 'POINT')} + ' ₺'">0 ₺</td>
+                            <td>
+                                <span th:if="${product.lowStock}" class="badge bg-danger" th:text="${product.stockQuantity}">0</span>
+                                <span th:unless="${product.lowStock}" class="badge bg-success" th:text="${product.stockQuantity}">0</span>
+                            </td>
+                            <td th:text="${product.unit}">Adet</td>
+                            <td>
+                                <span th:if="${product.active}" class="badge bg-success">Aktif</span>
+                                <span th:unless="${product.active}" class="badge bg-secondary">Pasif</span>
+                            </td>
+                            <td>
+                                <div class="btn-group btn-group-sm">
+                                    <a th:href="@{/stock-movements/product/{id}(id=${product.id})}" class="btn btn-outline-info" title="Stok Hareketleri">
+                                        <i class="bi bi-arrow-left-right"></i>
+                                    </a>
+                                    <a th:href="@{/products/edit/{id}(id=${product.id})}" class="btn btn-outline-primary" title="Düzenle">
+                                        <i class="bi bi-pencil"></i>
+                                    </a>
+                                    <a th:href="@{/products/deactivate/{id}(id=${product.id})}" class="btn btn-outline-warning" 
+                                       title="Devre Dışı Bırak" th:if="${product.active}"
+                                       onclick="return confirm('Bu ürünü devre dışı bırakmak istediğinize emin misiniz?')">
+                                        <i class="bi bi-pause-circle"></i>
+                                    </a>
+                                    <a th:href="@{/products/delete/{id}(id=${product.id})}" class="btn btn-outline-danger" title="Sil"
+                                       onclick="return confirm('Bu ürünü silmek istediğinize emin misiniz?')">
+                                        <i class="bi bi-trash"></i>
+                                    </a>
+                                </div>
+                            </td>
+                        </tr>
+                    </tbody>
+                </table>
+            </div>
+            
+            <div th:if="${#lists.isEmpty(products)}" class="text-center py-5 text-muted">
+                <i class="bi bi-inbox" style="font-size: 3rem;"></i>
+                <p class="mt-3">Henüz ürün bulunmuyor.</p>
+            </div>
+        </div>
+    </div>
+    
+    <div th:replace="~{fragments/layout :: scripts}"></div>
+</body>
+</html>

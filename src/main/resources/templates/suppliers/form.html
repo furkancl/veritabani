@@ -1,0 +1,72 @@
+<!DOCTYPE html>
+<html xmlns:th="http://www.thymeleaf.org" 
+      xmlns:sec="http://www.thymeleaf.org/extras/spring-security">
+<head th:replace="~{fragments/layout :: head('Tedarikçi Formu')}"></head>
+<body>
+    <nav th:replace="~{fragments/layout :: sidebar}"></nav>
+    
+    <div class="main-content">
+        <div th:replace="~{fragments/layout :: topbar}" th:with="pageTitle=${supplier.id == null} ? 'Yeni Tedarikçi' : 'Tedarikçi Düzenle'"></div>
+        <div th:replace="~{fragments/layout :: alerts}"></div>
+        
+        <div class="card">
+            <div class="card-header">
+                <i class="bi bi-truck me-2"></i>
+                <span th:text="${supplier.id == null} ? 'Yeni Tedarikçi Oluştur' : 'Tedarikçi Bilgilerini Düzenle'">Tedarikçi Formu</span>
+            </div>
+            <div class="card-body">
+                <form th:action="@{/suppliers/save}" th:object="${supplier}" method="post">
+                    <input type="hidden" th:field="*{id}">
+                    
+                    <div class="row">
+                        <div class="col-md-6 mb-3">
+                            <label class="form-label">Tedarikçi Adı *</label>
+                            <input type="text" class="form-control" th:field="*{name}" 
+                                   th:classappend="${#fields.hasErrors('name')} ? 'is-invalid'" required>
+                            <div class="invalid-feedback" th:if="${#fields.hasErrors('name')}" th:errors="*{name}">Hata</div>
+                        </div>
+                        <div class="col-md-6 mb-3">
+                            <label class="form-label">İletişim Kişisi</label>
+                            <input type="text" class="form-control" th:field="*{contactPerson}">
+                        </div>
+                    </div>
+                    
+                    <div class="row">
+                        <div class="col-md-6 mb-3">
+                            <label class="form-label">Telefon</label>
+                            <input type="text" class="form-control" th:field="*{phone}">
+                        </div>
+                        <div class="col-md-6 mb-3">
+                            <label class="form-label">Email</label>
+                            <input type="email" class="form-control" th:field="*{email}">
+                        </div>
+                    </div>
+                    
+                    <div class="mb-3">
+                        <label class="form-label">Adres</label>
+                        <textarea class="form-control" th:field="*{address}" rows="2"></textarea>
+                    </div>
+                    
+                    <div class="mb-3">
+                        <div class="form-check form-switch">
+                            <input class="form-check-input" type="checkbox" th:field="*{active}">
+                            <label class="form-check-label">Aktif</label>
+                        </div>
+                    </div>
+                    
+                    <div class="d-flex justify-content-end gap-2">
+                        <a th:href="@{/suppliers}" class="btn btn-secondary">
+                            <i class="bi bi-x-circle me-2"></i>İptal
+                        </a>
+                        <button type="submit" class="btn btn-primary">
+                            <i class="bi bi-check-circle me-2"></i>Kaydet
+                        </button>
+                    </div>
+                </form>
+            </div>
+        </div>
+    </div>
+    
+    <div th:replace="~{fragments/layout :: scripts}"></div>
+</body>
+</html>

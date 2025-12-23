@@ -1,0 +1,67 @@
+<!DOCTYPE html>
+<html xmlns:th="http://www.thymeleaf.org" 
+      xmlns:sec="http://www.thymeleaf.org/extras/spring-security">
+<head th:replace="~{fragments/layout :: head('Düşük Stok Raporu')}"></head>
+<body>
+    <nav th:replace="~{fragments/layout :: sidebar}"></nav>
+    
+    <div class="main-content">
+        <div th:replace="~{fragments/layout :: topbar}" th:with="pageTitle='Düşük Stok Raporu'"></div>
+        <div th:replace="~{fragments/layout :: alerts}"></div>
+        
+        <div class="table-container">
+            <div class="d-flex justify-content-between align-items-center mb-4">
+                <h5 class="mb-0">
+                    <i class="bi bi-exclamation-triangle text-danger me-2"></i>
+                    Düşük Stoklu Ürünler
+                    <span class="badge bg-danger ms-2" th:text="${products.size()}">0</span>
+                </h5>
+                <a th:href="@{/reports}" class="btn btn-outline-secondary btn-sm">
+                    <i class="bi bi-arrow-left me-1"></i>Raporlara Dön
+                </a>
+            </div>
+            
+            <div th:if="${#lists.isEmpty(products)}" class="text-center py-5">
+                <i class="bi bi-check-circle text-success" style="font-size: 4rem;"></i>
+                <h4 class="mt-4 text-success">Harika!</h4>
+                <p class="text-muted">Tüm ürünler yeterli stok seviyesinde. Düşük stoklu ürün bulunmuyor.</p>
+            </div>
+            
+            <div class="table-responsive" th:unless="${#lists.isEmpty(products)}">
+                <table class="table table-hover">
+                    <thead class="table-danger">
+                        <tr>
+                            <th>Ürün Kodu</th>
+                            <th>Ürün Adı</th>
+                            <th>Kategori</th>
+                            <th>Tedarikçi</th>
+                            <th>Mevcut Stok</th>
+                            <th>Min. Stok</th>
+                            <th>Eksik Miktar</th>
+                            <th>İşlem</th>
+                        </tr>
+                    </thead>
+                    <tbody>
+                        <tr th:each="product : ${products}">
+                            <td th:text="${product.code}">PRD001</td>
+                            <td th:text="${product.name}">Ürün</td>
+                            <td th:text="${product.category?.name}">Kategori</td>
+                            <td th:text="${product.supplier?.name}">Tedarikçi</td>
+                            <td><span class="badge bg-danger" th:text="${product.stockQuantity}">0</span></td>
+                            <td th:text="${product.minStockLevel}">10</td>
+                            <td class="text-danger fw-bold" th:text="${product.minStockLevel - product.stockQuantity}">10</td>
+                            <td>
+                                <a th:href="@{/stock-movements/new}" class="btn btn-success btn-sm">
+                                    <i class="bi bi-plus-circle me-1"></i>Stok Ekle
+                                </a>
+                            </td>
+                        </tr>
+                    </tbody>
+                </table>
+            </div>
+        </div>
+    </div>
+    
+    <div th:replace="~{fragments/layout :: scripts}"></div>
+</body>
+</html>

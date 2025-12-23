@@ -1,0 +1,184 @@
+<!DOCTYPE html>
+<html xmlns:th="http://www.thymeleaf.org" 
+      xmlns:sec="http://www.thymeleaf.org/extras/spring-security">
+<head th:replace="~{fragments/layout :: head('Raporlar')}"></head>
+<body>
+    <nav th:replace="~{fragments/layout :: sidebar}"></nav>
+    
+    <div class="main-content">
+        <div th:replace="~{fragments/layout :: topbar}" th:with="pageTitle='Raporlar'"></div>
+        <div th:replace="~{fragments/layout :: alerts}"></div>
+        
+        <!-- Statistics Cards -->
+        <div class="row mb-4">
+            <div class="col-md-3 mb-3">
+                <div class="card stat-card">
+                    <div class="d-flex justify-content-between align-items-center">
+                        <div>
+                            <p class="text-muted mb-1">Toplam Ürün</p>
+                            <h3 class="stat-value mb-0" th:text="${totalProducts}">0</h3>
+                        </div>
+                        <div class="stat-icon bg-primary text-white">
+                            <i class="bi bi-box"></i>
+                        </div>
+                    </div>
+                </div>
+            </div>
+            <div class="col-md-3 mb-3">
+                <div class="card stat-card">
+                    <div class="d-flex justify-content-between align-items-center">
+                        <div>
+                            <p class="text-muted mb-1">Toplam Stok Değeri</p>
+                            <h3 class="stat-value mb-0" th:text="${#numbers.formatDecimal(totalStockValue, 0, 'COMMA', 2, 'POINT')} + ' ₺'">0 ₺</h3>
+                        </div>
+                        <div class="stat-icon bg-success text-white">
+                            <i class="bi bi-currency-dollar"></i>
+                        </div>
+                    </div>
+                </div>
+            </div>
+            <div class="col-md-3 mb-3">
+                <div class="card stat-card">
+                    <div class="d-flex justify-content-between align-items-center">
+                        <div>
+                            <p class="text-muted mb-1">Toplam Giriş</p>
+                            <h3 class="stat-value text-success mb-0" th:text="${totalInQuantity}">0</h3>
+                        </div>
+                        <div class="stat-icon bg-success text-white">
+                            <i class="bi bi-arrow-down-circle"></i>
+                        </div>
+                    </div>
+                </div>
+            </div>
+            <div class="col-md-3 mb-3">
+                <div class="card stat-card">
+                    <div class="d-flex justify-content-between align-items-center">
+                        <div>
+                            <p class="text-muted mb-1">Toplam Çıkış</p>
+                            <h3 class="stat-value text-danger mb-0" th:text="${totalOutQuantity}">0</h3>
+                        </div>
+                        <div class="stat-icon bg-danger text-white">
+                            <i class="bi bi-arrow-up-circle"></i>
+                        </div>
+                    </div>
+                </div>
+            </div>
+        </div>
+        
+        <!-- Report Links -->
+        <div class="row mb-4">
+            <div class="col-md-4 mb-3">
+                <div class="card h-100">
+                    <div class="card-body text-center">
+                        <i class="bi bi-exclamation-triangle text-danger" style="font-size: 3rem;"></i>
+                        <h5 class="mt-3">Düşük Stok Raporu</h5>
+                        <p class="text-muted">Minimum stok seviyesinin altındaki ürünler</p>
+                        <a th:href="@{/reports/low-stock}" class="btn btn-outline-danger">
+                            <i class="bi bi-eye me-2"></i>Görüntüle
+                        </a>
+                    </div>
+                </div>
+            </div>
+            <div class="col-md-4 mb-3">
+                <div class="card h-100">
+                    <div class="card-body text-center">
+                        <i class="bi bi-arrow-left-right text-primary" style="font-size: 3rem;"></i>
+                        <h5 class="mt-3">Stok Hareket Raporu</h5>
+                        <p class="text-muted">Tarih aralığına göre stok hareketleri</p>
+                        <a th:href="@{/reports/stock-movements}" class="btn btn-outline-primary">
+                            <i class="bi bi-eye me-2"></i>Görüntüle
+                        </a>
+                    </div>
+                </div>
+            </div>
+            <div class="col-md-4 mb-3">
+                <div class="card h-100">
+                    <div class="card-body text-center">
+                        <i class="bi bi-graph-up text-success" style="font-size: 3rem;"></i>
+                        <h5 class="mt-3">Stok Durumu</h5>
+                        <p class="text-muted">Tüm ürünlerin stok durumu</p>
+                        <span class="badge bg-info" th:text="${totalProducts} + ' Ürün'">0 Ürün</span>
+                    </div>
+                </div>
+            </div>
+        </div>
+        
+        <!-- Low Stock Products -->
+        <div class="card mb-4">
+            <div class="card-header bg-danger text-white">
+                <i class="bi bi-exclamation-triangle me-2"></i>
+                Düşük Stoklu Ürünler (Kritik)
+            </div>
+            <div class="card-body">
+                <div th:if="${#lists.isEmpty(lowStockProducts)}" class="text-center py-3 text-muted">
+                    <i class="bi bi-check-circle text-success" style="font-size: 2rem;"></i>
+                    <p class="mb-0 mt-2">Tüm ürünler yeterli stok seviyesinde.</p>
+                </div>
+                <div class="table-responsive" th:unless="${#lists.isEmpty(lowStockProducts)}">
+                    <table class="table table-hover mb-0">
+                        <thead>
+                            <tr>
+                                <th>Ürün Kodu</th>
+                                <th>Ürün Adı</th>
+                                <th>Kategori</th>
+                                <th>Mevcut Stok</th>
+                                <th>Min. Stok</th>
+                                <th>Eksik</th>
+                            </tr>
+                        </thead>
+                        <tbody>
+                            <tr th:each="product : ${lowStockProducts}">
+                                <td th:text="${product.code}">PRD001</td>
+                                <td th:text="${product.name}">Ürün</td>
+                                <td th:text="${product.category?.name}">Kategori</td>
+                                <td><span class="badge bg-danger" th:text="${product.stockQuantity}">0</span></td>
+                                <td th:text="${product.minStockLevel}">10</td>
+                                <td class="text-danger" th:text="${product.minStockLevel - product.stockQuantity}">10</td>
+                            </tr>
+                        </tbody>
+                    </table>
+                </div>
+            </div>
+        </div>
+        
+        <!-- All Products Stock -->
+        <div class="card">
+            <div class="card-header bg-primary text-white">
+                <i class="bi bi-box me-2"></i>
+                Tüm Ürünler Stok Durumu
+            </div>
+            <div class="card-body">
+                <div class="table-responsive">
+                    <table class="table table-hover mb-0">
+                        <thead>
+                            <tr>
+                                <th>Ürün Kodu</th>
+                                <th>Ürün Adı</th>
+                                <th>Kategori</th>
+                                <th>Stok</th>
+                                <th>Birim Fiyat</th>
+                                <th>Stok Değeri</th>
+                            </tr>
+                        </thead>
+                        <tbody>
+                            <tr th:each="product : ${allProducts}">
+                                <td th:text="${product.code}">PRD001</td>
+                                <td th:text="${product.name}">Ürün</td>
+                                <td th:text="${product.category?.name}">Kategori</td>
+                                <td>
+                                    <span class="badge" th:classappend="${product.lowStock} ? 'bg-danger' : 'bg-success'" 
+                                          th:text="${product.stockQuantity}">0</span>
+                                </td>
+                                <td th:text="${#numbers.formatDecimal(product.price, 0, 'COMMA', 2, 'POINT')} + ' ₺'">0 ₺</td>
+                                <td th:text="${#numbers.formatDecimal(product.price * product.stockQuantity, 0, 'COMMA', 2, 'POINT')} + ' ₺'">0 ₺</td>
+                            </tr>
+                        </tbody>
+                    </table>
+                </div>
+            </div>
+        </div>
+    </div>
+    
+    <div th:replace="~{fragments/layout :: scripts}"></div>
+</body>
+</html>

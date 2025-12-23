@@ -1,0 +1,68 @@
+<!DOCTYPE html>
+<html xmlns:th="http://www.thymeleaf.org" 
+      xmlns:sec="http://www.thymeleaf.org/extras/spring-security">
+<head th:replace="~{fragments/layout :: head('Kategoriler')}"></head>
+<body>
+    <nav th:replace="~{fragments/layout :: sidebar}"></nav>
+    
+    <div class="main-content">
+        <div th:replace="~{fragments/layout :: topbar}" th:with="pageTitle='Kategori Yönetimi'"></div>
+        <div th:replace="~{fragments/layout :: alerts}"></div>
+        
+        <div class="table-container">
+            <div class="d-flex justify-content-between align-items-center mb-4">
+                <h5 class="mb-0"><i class="bi bi-tags me-2"></i>Kategori Listesi</h5>
+                <a th:href="@{/categories/new}" class="btn btn-primary" sec:authorize="hasRole('ADMIN')">
+                    <i class="bi bi-plus-circle me-2"></i>Yeni Kategori
+                </a>
+            </div>
+            
+            <div class="table-responsive">
+                <table class="table table-hover">
+                    <thead class="table-dark">
+                        <tr>
+                            <th>ID</th>
+                            <th>Kategori Adı</th>
+                            <th>Açıklama</th>
+                            <th>Ürün Sayısı</th>
+                            <th>Toplam Değer</th>
+                            <th>İşlemler</th>
+                        </tr>
+                    </thead>
+                    <tbody>
+                        <tr th:each="category : ${categories}">
+                            <td th:text="${category.id}">1</td>
+                            <td th:text="${category.name}">Kategori</td>
+                            <td th:text="${category.description}">Açıklama</td>
+                            <td>
+                                <span class="badge bg-info" th:text="${category.products.size()}">0</span>
+                            </td>
+                            <td>
+                                <span class="text-success fw-bold" th:text="${#numbers.formatDecimal(category.totalValue, 1, 'COMMA', 2, 'POINT')} + ' ₺'">0,00 ₺</span>
+                            </td>
+                            <td>
+                                <div class="btn-group btn-group-sm" sec:authorize="hasRole('ADMIN')">
+                                    <a th:href="@{/categories/edit/{id}(id=${category.id})}" class="btn btn-outline-primary" title="Düzenle">
+                                        <i class="bi bi-pencil"></i>
+                                    </a>
+                                    <a th:href="@{/categories/delete/{id}(id=${category.id})}" class="btn btn-outline-danger" title="Sil"
+                                       onclick="return confirm('Bu kategoriyi silmek istediğinize emin misiniz?')">
+                                        <i class="bi bi-trash"></i>
+                                    </a>
+                                </div>
+                            </td>
+                        </tr>
+                    </tbody>
+                </table>
+            </div>
+            
+            <div th:if="${#lists.isEmpty(categories)}" class="text-center py-5 text-muted">
+                <i class="bi bi-inbox" style="font-size: 3rem;"></i>
+                <p class="mt-3">Henüz kategori bulunmuyor.</p>
+            </div>
+        </div>
+    </div>
+    
+    <div th:replace="~{fragments/layout :: scripts}"></div>
+</body>
+</html>

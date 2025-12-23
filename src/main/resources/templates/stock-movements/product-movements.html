@@ -1,0 +1,88 @@
+<!DOCTYPE html>
+<html xmlns:th="http://www.thymeleaf.org" 
+      xmlns:sec="http://www.thymeleaf.org/extras/spring-security">
+<head th:replace="~{fragments/layout :: head('Ürün Stok Hareketleri')}"></head>
+<body>
+    <nav th:replace="~{fragments/layout :: sidebar}"></nav>
+    
+    <div class="main-content">
+        <div th:replace="~{fragments/layout :: topbar}" th:with="pageTitle='Ürün Stok Hareketleri'"></div>
+        <div th:replace="~{fragments/layout :: alerts}"></div>
+        
+        <div class="card mb-4">
+            <div class="card-body">
+                <div class="row">
+                    <div class="col-md-3">
+                        <strong>Ürün Kodu:</strong> <span th:text="${product.code}">PRD001</span>
+                    </div>
+                    <div class="col-md-3">
+                        <strong>Ürün Adı:</strong> <span th:text="${product.name}">Ürün</span>
+                    </div>
+                    <div class="col-md-3">
+                        <strong>Mevcut Stok:</strong> 
+                        <span class="badge" th:classappend="${product.lowStock} ? 'bg-danger' : 'bg-success'" 
+                              th:text="${product.stockQuantity}">0</span>
+                    </div>
+                    <div class="col-md-3">
+                        <a th:href="@{/products}" class="btn btn-outline-secondary btn-sm">
+                            <i class="bi bi-arrow-left me-1"></i>Ürünlere Dön
+                        </a>
+                    </div>
+                </div>
+            </div>
+        </div>
+        
+        <div class="table-container">
+            <div class="d-flex justify-content-between align-items-center mb-4">
+                <h5 class="mb-0"><i class="bi bi-clock-history me-2"></i>Stok Geçmişi</h5>
+                <a th:href="@{/stock-movements/new}" class="btn btn-primary btn-sm">
+                    <i class="bi bi-plus-circle me-1"></i>Yeni Hareket
+                </a>
+            </div>
+            
+            <div class="table-responsive">
+                <table class="table table-hover">
+                    <thead class="table-dark">
+                        <tr>
+                            <th>Referans No</th>
+                            <th>Hareket Tipi</th>
+                            <th>Miktar</th>
+                            <th>Önceki Stok</th>
+                            <th>Yeni Stok</th>
+                            <th>Açıklama</th>
+                            <th>Kullanıcı</th>
+                            <th>Tarih</th>
+                        </tr>
+                    </thead>
+                    <tbody>
+                        <tr th:each="movement : ${movements}">
+                            <td th:text="${movement.referenceNo}">STK-XXXXX</td>
+                            <td>
+                                <span th:if="${movement.movementType.name() == 'IN'}" class="badge bg-success">
+                                    <i class="bi bi-arrow-down-circle me-1"></i>Giriş
+                                </span>
+                                <span th:if="${movement.movementType.name() == 'OUT'}" class="badge bg-danger">
+                                    <i class="bi bi-arrow-up-circle me-1"></i>Çıkış
+                                </span>
+                            </td>
+                            <td th:text="${movement.quantity}">0</td>
+                            <td th:text="${movement.previousQuantity}">0</td>
+                            <td th:text="${movement.newQuantity}">0</td>
+                            <td th:text="${movement.description}">Açıklama</td>
+                            <td th:text="${movement.user?.fullName}">Kullanıcı</td>
+                            <td th:text="${#temporals.format(movement.createdAt, 'dd.MM.yyyy HH:mm')}">Tarih</td>
+                        </tr>
+                    </tbody>
+                </table>
+            </div>
+            
+            <div th:if="${#lists.isEmpty(movements)}" class="text-center py-5 text-muted">
+                <i class="bi bi-inbox" style="font-size: 3rem;"></i>
+                <p class="mt-3">Bu ürün için henüz stok hareketi bulunmuyor.</p>
+            </div>
+        </div>
+    </div>
+    
+    <div th:replace="~{fragments/layout :: scripts}"></div>
+</body>
+</html>
