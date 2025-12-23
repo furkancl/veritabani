@@ -16,6 +16,7 @@ import java.util.UUID;
 
 @Service
 @Transactional
+@SuppressWarnings("null")
 public class StockMovementService {
 
     @Autowired
